@@ -67,6 +67,50 @@ primera visita después de eso tarda 30-50 segundos en responder mientras
 antes de tu sustentación o de que tus compañeros la vean, para que ya esté
 despierta.
 
+## Paso 4 (opcional): que los datos no se borren nunca (MongoDB Atlas gratis)
+
+Por defecto, AgroRuta guarda todo en memoria: si el backend se reinicia (por
+inactividad o un nuevo deploy), vuelve a los datos de ejemplo. Para que lo
+que publiques/compres/dones quede guardado para siempre, gratis:
+
+1. Ve a https://www.mongodb.com/cloud/atlas/register y crea una cuenta
+   gratuita (puedes usar "Sign up with Google" con tu cuenta de siempre).
+2. Cuando te pregunte, crea un cluster **"M0 Free"** (el gratuito).
+3. En **"Database Access"**, crea un usuario de base de datos (usuario y
+   contraseña — anótalos, o deja que Atlas genere la contraseña por ti).
+4. En **"Network Access"**, clic en **"Add IP Address"** → **"Allow Access
+   from Anywhere"** (`0.0.0.0/0`) — necesario porque Render no tiene una IP
+   fija.
+5. En tu cluster, clic en **"Connect"** → **"Drivers"** → copia la cadena de
+   conexión, que se ve así:
+   `mongodb+srv://usuario:contraseña@cluster0.xxxxx.mongodb.net/?retryWrites=true&w=majority`
+   Reemplaza `<password>` por la contraseña real de tu usuario de base de
+   datos.
+
+   ⚠️ **Esa cadena incluye tu contraseña — trátala como una contraseña.**
+   No la pegues en el chat ni la subas a GitHub. Ponla directamente donde
+   la necesites (pasos 6 y 7).
+
+6. **En Render** (para producción): entra a tu servicio `agroruta` (el
+   backend) → **Environment** → **Add Environment Variable**:
+   - Key: `MONGODB_URI`
+   - Value: (pega ahí tu cadena de conexión completa)
+   Guarda — Render redesplegará el backend solo, y en los **Logs** verás
+   el mensaje `Conectado a MongoDB Atlas: los datos ahora persisten`.
+
+7. **En tu PC** (para probarlo en local, opcional): crea un archivo
+   `server/.env` (cópialo de `server/.env.example`) y pega ahí la misma
+   variable:
+   ```
+   MONGODB_URI=mongodb+srv://usuario:contraseña@cluster0.xxxxx.mongodb.net/?retryWrites=true&w=majority
+   ```
+   Ese archivo ya está en `.gitignore`, nunca se sube a GitHub.
+
+A partir de ahí, la primera vez que arranque el backend con `MONGODB_URI`
+configurada, guarda los datos de ejemplo en tu base de datos; de ahí en
+adelante, todo lo que se publique, compre o done queda guardado ahí para
+siempre, sin importar cuántas veces se reinicie o duerma el servicio.
+
 ## Si cambias el código después
 
 Cada vez que hagas `git push` a la rama principal, Render vuelve a
