@@ -52,3 +52,22 @@ metricasRouter.get("/", (req, res) => {
     ingresosComision,
   });
 });
+
+// GET /api/metricas/historico -> evolucion de kg rescatados por dia
+// (para el grafico de la North Star Metric en el tiempo)
+metricasRouter.get("/historico", (req, res) => {
+  const kgPorDia = {};
+  transacciones.forEach((t) => {
+    const dia = t.fecha.slice(0, 10); // "YYYY-MM-DD"
+    kgPorDia[dia] = (kgPorDia[dia] || 0) + t.cantidadKg;
+  });
+
+  const dias = Object.keys(kgPorDia).sort();
+  let acumulado = 0;
+  const serie = dias.map((dia) => {
+    acumulado += kgPorDia[dia];
+    return { fecha: dia, kgDelDia: kgPorDia[dia], kgAcumulado: acumulado };
+  });
+
+  res.json(serie);
+});

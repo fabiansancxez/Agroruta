@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { api } from "../api.js";
+import GraficoEvolucion from "./GraficoEvolucion.jsx";
 
 const formatoCOP = new Intl.NumberFormat("es-CO", {
   style: "currency",
@@ -9,12 +10,17 @@ const formatoCOP = new Intl.NumberFormat("es-CO", {
 
 export default function MetricasView() {
   const [metricas, setMetricas] = useState(null);
+  const [historico, setHistorico] = useState(null);
   const [error, setError] = useState("");
 
   async function cargar() {
     try {
-      const datos = await api.obtenerMetricas();
+      const [datos, serieHistorica] = await Promise.all([
+        api.obtenerMetricas(),
+        api.obtenerHistorico(),
+      ]);
       setMetricas(datos);
+      setHistorico(serieHistorica);
     } catch (e) {
       setError(e.message);
     }
@@ -82,6 +88,14 @@ export default function MetricasView() {
           Tasa de rescate: <strong>{tasaRescatePorcentaje}%</strong> de lo publicado
           evitó convertirse en desperdicio.
         </p>
+      </section>
+
+      <section className="panel">
+        <h2>Evolución de kg rescatados</h2>
+        <p className="panel__ayuda">
+          Progreso acumulado de la North Star Metric a lo largo del tiempo.
+        </p>
+        <GraficoEvolucion serie={historico} />
       </section>
 
       <section className="panel">

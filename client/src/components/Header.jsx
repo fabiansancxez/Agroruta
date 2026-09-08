@@ -1,6 +1,7 @@
 const VISTAS = [
   { id: "comerciante", label: "Comerciante", detalle: "Publicar excedentes" },
   { id: "marketplace", label: "Compradores / Organizaciones", detalle: "Rescatar excedentes" },
+  { id: "historial", label: "Historial", detalle: "Trazabilidad" },
   { id: "metricas", label: "Métricas", detalle: "Impacto y North Star" },
 ];
 

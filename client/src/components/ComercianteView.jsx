@@ -4,6 +4,26 @@ import ExcedenteCard from "./ExcedenteCard.jsx";
 
 const ESTADO_PRODUCTO = ["Bueno", "Por vencer", "Regular"];
 
+// Protocolo de inspeccion de alimentos: los 4 puntos que pidio el docente
+// para determinar que un excedente si es apto para comercializar o donar.
+const PUNTOS_PROTOCOLO = [
+  { clave: "empaqueEnBuenEstado", etiqueta: "El empaque o embalaje está en buen estado" },
+  {
+    clave: "sinSignosDescomposicion",
+    etiqueta: "No presenta signos de descomposición (moho, mal olor, líquidos)",
+  },
+  {
+    clave: "temperaturaAdecuada",
+    etiqueta: "Se mantuvo a una temperatura de almacenamiento adecuada",
+  },
+  { clave: "pesoVerificado", etiqueta: "La cantidad y el peso fueron verificados físicamente" },
+];
+
+const PROTOCOLO_INICIAL = PUNTOS_PROTOCOLO.reduce(
+  (acc, punto) => ({ ...acc, [punto.clave]: false }),
+  {}
+);
+
 const FORM_INICIAL = {
   comerciante: "",
   tipoAlimento: "",
@@ -19,9 +39,12 @@ const FORM_INICIAL = {
 export default function ComercianteView() {
   const [misExcedentes, setMisExcedentes] = useState([]);
   const [form, setForm] = useState(FORM_INICIAL);
+  const [protocolo, setProtocolo] = useState(PROTOCOLO_INICIAL);
   const [enviando, setEnviando] = useState(false);
   const [mensaje, setMensaje] = useState("");
   const [error, setError] = useState("");
+
+  const protocoloCompleto = PUNTOS_PROTOCOLO.every((punto) => protocolo[punto.clave]);
 
   async function cargar() {
     const todos = await api.listarExcedentes();
@@ -48,6 +71,11 @@ export default function ComercianteView() {
       return;
     }
 
+    if (!protocoloCompleto) {
+      setError("Debes confirmar los 4 puntos del protocolo de inspección para publicar.");
+      return;
+    }
+
     setEnviando(true);
     try {
       await api.publicarExcedente({
@@ -55,9 +83,11 @@ export default function ComercianteView() {
         cantidadKg: Number(form.cantidadKg),
         precio: form.modalidad === "donacion" ? 0 : Number(form.precio) || 0,
         vidaUtilHoras: Number(form.vidaUtilHoras),
+        protocolo,
       });
       setMensaje("Excedente publicado. Ya es visible en el marketplace.");
       setForm(FORM_INICIAL);
+      setProtocolo(PROTOCOLO_INICIAL);
       await cargar();
     } catch (err) {
       setError(err.message);
@@ -179,10 +209,38 @@ export default function ComercianteView() {
             </label>
           </div>
 
+          <fieldset className="protocolo">
+            <legend>
+              Protocolo de inspección <span className="protocolo__obligatorio">(obligatorio)</span>
+            </legend>
+            <p className="panel__ayuda">
+              Confirma que verificaste el estado del alimento antes de publicarlo. Este
+              protocolo es lo que permite que AgroRuta garantice que solo se comercializan
+              o donan excedentes realmente aprovechables.
+            </p>
+            {PUNTOS_PROTOCOLO.map((punto) => (
+              <label key={punto.clave} className="protocolo__item">
+                <input
+                  type="checkbox"
+                  checked={protocolo[punto.clave]}
+                  onChange={(e) =>
+                    setProtocolo((p) => ({ ...p, [punto.clave]: e.target.checked }))
+                  }
+                />
+                {punto.etiqueta}
+              </label>
+            ))}
+          </fieldset>
+
           {error && <p className="error-texto">{error}</p>}
           {mensaje && <p className="exito-texto">{mensaje}</p>}
 
-          <button className="btn btn--primario" type="submit" disabled={enviando}>
+          <button
+            className="btn btn--primario"
+            type="submit"
+            disabled={enviando || !protocoloCompleto}
+            title={!protocoloCompleto ? "Completa el protocolo de inspección primero" : ""}
+          >
             {enviando ? "Publicando..." : "Publicar excedente"}
           </button>
         </form>

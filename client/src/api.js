@@ -30,4 +30,6 @@ export const api = {
       body: JSON.stringify(payload),
     }).then(handle),
   obtenerMetricas: () => fetch(`${BASE}/metricas`).then(handle),
+  obtenerHistorico: () => fetch(`${BASE}/metricas/historico`).then(handle),
+  listarTransacciones: () => fetch(`${BASE}/transacciones`).then(handle),
 };

@@ -443,6 +443,138 @@ body {
   font-size: 0.85rem;
 }
 
+/* Protocolo de inspeccion */
+.protocolo {
+  border: 1px dashed var(--musgo);
+  border-radius: 10px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.protocolo legend {
+  font-weight: 700;
+  color: var(--verde-oscuro);
+  padding: 0 0.4rem;
+}
+
+.protocolo__obligatorio {
+  font-weight: 400;
+  color: var(--rojo);
+  font-size: 0.8rem;
+}
+
+.protocolo__item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 400;
+  color: var(--tinta);
+  margin: 0.4rem 0;
+}
+
+.card__protocolo {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--verde-oscuro);
+  font-weight: 600;
+}
+
+/* Buscador */
+.buscador {
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+  padding: 0.5rem 0.8rem;
+  font-size: 0.85rem;
+  min-width: 240px;
+}
+
+/* Tabla de historial */
+.tabla-envoltorio {
+  overflow-x: auto;
+  margin-top: 1rem;
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.tabla th,
+.tabla td {
+  text-align: left;
+  padding: 0.6rem 0.7rem;
+  border-bottom: 1px solid var(--borde);
+  white-space: nowrap;
+}
+
+.tabla th {
+  color: var(--tinta-suave);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+}
+
+.tabla__actor-tipo {
+  color: var(--tinta-suave);
+  font-size: 0.75rem;
+}
+
+.etiqueta-tipo {
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: white;
+}
+
+.etiqueta-tipo--compra {
+  background: var(--verde);
+}
+
+.etiqueta-tipo--donacion {
+  background: var(--amarillo);
+}
+
+/* Grafico de evolucion (SVG a mano) */
+.grafico-evolucion {
+  width: 100%;
+  height: auto;
+  margin-top: 0.5rem;
+}
+
+.grafico-evolucion__guia {
+  stroke: var(--borde);
+  stroke-width: 1;
+}
+
+.grafico-evolucion__area {
+  fill: var(--musgo);
+  opacity: 0.15;
+  stroke: none;
+}
+
+.grafico-evolucion__linea {
+  fill: none;
+  stroke: var(--verde-oscuro);
+  stroke-width: 2.5;
+}
+
+.grafico-evolucion__punto {
+  fill: var(--verde-oscuro);
+}
+
+.grafico-evolucion__etiqueta {
+  font-size: 9px;
+  fill: var(--tinta-suave);
+  text-anchor: middle;
+}
+
+.grafico-evolucion__etiqueta--max {
+  text-anchor: start;
+  font-weight: 700;
+}
+
 .app-footer {
   text-align: center;
   padding: 1rem;

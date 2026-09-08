@@ -5,6 +5,7 @@ import ExcedenteCard from "./ExcedenteCard.jsx";
 export default function MarketplaceView() {
   const [excedentes, setExcedentes] = useState([]);
   const [filtroModalidad, setFiltroModalidad] = useState("todos");
+  const [busqueda, setBusqueda] = useState("");
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState("");
 
@@ -13,6 +14,7 @@ export default function MarketplaceView() {
     try {
       const params = { estado: "disponible" };
       if (filtroModalidad !== "todos") params.modalidad = filtroModalidad;
+      if (busqueda.trim()) params.q = busqueda.trim();
       const datos = await api.listarExcedentes(params);
       setExcedentes(datos);
     } catch (e) {
@@ -26,6 +28,13 @@ export default function MarketplaceView() {
     cargar();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filtroModalidad]);
+
+  useEffect(() => {
+    // Pequeña espera para no disparar una petición por cada tecla.
+    const espera = setTimeout(cargar, 300);
+    return () => clearTimeout(espera);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [busqueda]);
 
   async function manejarAccion(excedenteId, payload) {
     await api.registrarTransaccion(excedenteId, payload);
@@ -44,6 +53,13 @@ export default function MarketplaceView() {
             </p>
           </div>
           <div className="filtros">
+            <input
+              type="text"
+              className="buscador"
+              placeholder="Buscar por alimento, bodega o ubicación..."
+              value={busqueda}
+              onChange={(e) => setBusqueda(e.target.value)}
+            />
             <button
               className={`chip ${filtroModalidad === "todos" ? "chip--activo" : ""}`}
               onClick={() => setFiltroModalidad("todos")}

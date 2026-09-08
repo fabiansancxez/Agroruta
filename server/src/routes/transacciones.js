@@ -2,6 +2,7 @@ import { Router } from "express";
 import { randomUUID } from "node:crypto";
 import { excedentes, transacciones } from "../db.js";
 import { calcularEstadoVida } from "../lib/vidaUtil.js";
+import { actualizarExcedente, guardarTransaccion } from "../persistencia.js";
 
 export const transaccionesRouter = Router();
 
@@ -10,7 +11,7 @@ const COMISION_AGRORUTA = 0.08; // 8% sobre ventas comerciales, tal como en el p
 // POST /api/excedentes/:id/transaccion
 // Registra que un comprador compro el excedente, o que una organizacion
 // social reclamo la donacion.
-transaccionesRouter.post("/excedentes/:id/transaccion", (req, res) => {
+transaccionesRouter.post("/excedentes/:id/transaccion", async (req, res) => {
   const excedente = excedentes.find((e) => e.id === req.params.id);
   if (!excedente) {
     return res.status(404).json({ error: "Excedente no encontrado" });
@@ -35,11 +36,16 @@ transaccionesRouter.post("/excedentes/:id/transaccion", (req, res) => {
   const comision = esDonacion ? 0 : Math.round(monto * COMISION_AGRORUTA);
 
   excedente.estadoTransaccion = esDonacion ? "reclamado" : "vendido";
+  await actualizarExcedente(excedente.id, { estadoTransaccion: excedente.estadoTransaccion });
 
   const transaccion = {
     id: randomUUID(),
     excedenteId: excedente.id,
     tipoOperacion: esDonacion ? "donacion" : "compra",
+    // Datos del excedente copiados aqui para que el historial se pueda
+    // mostrar sin tener que cruzar con la lista de excedentes.
+    tipoAlimento: excedente.tipoAlimento,
+    comerciante: excedente.comerciante,
     actorNombre,
     actorTipo, // 'comprador' | 'organizacion'
     cantidadKg: excedente.cantidadKg,
@@ -48,11 +54,15 @@ transaccionesRouter.post("/excedentes/:id/transaccion", (req, res) => {
     fecha: new Date().toISOString(),
   };
   transacciones.unshift(transaccion);
+  await guardarTransaccion(transaccion);
 
   res.status(201).json({ transaccion, excedente });
 });
 
 // GET /api/transacciones -> historial completo (para trazabilidad)
 transaccionesRouter.get("/transacciones", (req, res) => {
-  res.json(transacciones);
+  const ordenado = [...transacciones].sort(
+    (a, b) => new Date(b.fecha) - new Date(a.fecha)
+  );
+  res.json(ordenado);
 });

@@ -60,6 +60,9 @@ export default function ExcedenteCard({ excedente, modoMarketplace, onAccion }) 
       <p className="card__meta">
         {excedente.comerciante} · {excedente.ubicacion}
       </p>
+      {excedente.protocolo && (
+        <p className="card__protocolo">✓ Protocolo de inspección verificado</p>
+      )}
       <p className="card__descripcion">{excedente.descripcion}</p>
 
       <dl className="card__datos">

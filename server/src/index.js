@@ -3,6 +3,8 @@ import cors from "cors";
 import { excedentesRouter } from "./routes/excedentes.js";
 import { transaccionesRouter } from "./routes/transacciones.js";
 import { metricasRouter } from "./routes/metricas.js";
+import { conectarBD } from "./persistencia.js";
+import { iniciarDatos } from "./db.js";
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -17,6 +19,9 @@ app.get("/api/health", (req, res) => {
 app.use("/api/excedentes", excedentesRouter);
 app.use("/api", transaccionesRouter); // /api/excedentes/:id/transaccion y /api/transacciones
 app.use("/api/metricas", metricasRouter);
+
+await conectarBD();
+await iniciarDatos();
 
 app.listen(PORT, () => {
   console.log(`AgroRuta API escuchando en http://localhost:${PORT}`);

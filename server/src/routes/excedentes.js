@@ -2,8 +2,16 @@ import { Router } from "express";
 import { randomUUID } from "node:crypto";
 import { excedentes } from "../db.js";
 import { calcularEstadoVida } from "../lib/vidaUtil.js";
+import { guardarExcedente } from "../persistencia.js";
 
 export const excedentesRouter = Router();
+
+const PUNTOS_PROTOCOLO = [
+  "empaqueEnBuenEstado",
+  "sinSignosDescomposicion",
+  "temperaturaAdecuada",
+  "pesoVerificado",
+];
 
 function enriquecer(excedente) {
   const vida = calcularEstadoVida(excedente.fechaLimite);
@@ -17,9 +25,9 @@ function enriquecer(excedente) {
   return { ...excedente, vida };
 }
 
-// GET /api/excedentes?estado=disponible&modalidad=venta
+// GET /api/excedentes?estado=disponible&modalidad=venta&q=tomate
 excedentesRouter.get("/", (req, res) => {
-  const { estado, modalidad } = req.query;
+  const { estado, modalidad, q } = req.query;
 
   let resultado = excedentes.map(enriquecer);
 
@@ -28,6 +36,14 @@ excedentesRouter.get("/", (req, res) => {
   }
   if (modalidad) {
     resultado = resultado.filter((e) => e.modalidad === modalidad);
+  }
+  if (q) {
+    const busqueda = q.toLowerCase().trim();
+    resultado = resultado.filter((e) =>
+      [e.tipoAlimento, e.ubicacion, e.comerciante].some((campo) =>
+        (campo || "").toLowerCase().includes(busqueda)
+      )
+    );
   }
 
   // Priorizacion: los excedentes disponibles se ordenan por menor tiempo
@@ -44,7 +60,7 @@ excedentesRouter.get("/:id", (req, res) => {
 });
 
 // POST /api/excedentes  -> un comerciante publica un nuevo excedente
-excedentesRouter.post("/", (req, res) => {
+excedentesRouter.post("/", async (req, res) => {
   const {
     comerciante,
     tipoAlimento,
@@ -55,12 +71,24 @@ excedentesRouter.post("/", (req, res) => {
     modalidad,
     ubicacion,
     vidaUtilHoras,
+    protocolo,
   } = req.body;
 
   if (!comerciante || !tipoAlimento || !cantidadKg || !vidaUtilHoras) {
     return res.status(400).json({
       error:
         "Faltan campos obligatorios: comerciante, tipoAlimento, cantidadKg, vidaUtilHoras.",
+    });
+  }
+
+  // Protocolo de inspeccion: los 4 puntos deben quedar confirmados antes de
+  // publicar. Este es el diferenciador que pidio el docente: no basta con
+  // conectar oferta y demanda, hay que verificar que el alimento es apto.
+  const puntosConfirmados = PUNTOS_PROTOCOLO.every((punto) => protocolo?.[punto] === true);
+  if (!puntosConfirmados) {
+    return res.status(400).json({
+      error:
+        "Debes confirmar los 4 puntos del protocolo de inspeccion antes de publicar.",
     });
   }
 
@@ -80,11 +108,13 @@ excedentesRouter.post("/", (req, res) => {
     precio: esDonacion ? 0 : Number(precio) || 0,
     modalidad: esDonacion ? "donacion" : "venta",
     ubicacion: ubicacion || "Corabastos",
+    protocolo: PUNTOS_PROTOCOLO.reduce((acc, punto) => ({ ...acc, [punto]: true }), {}),
     fechaPublicacion: ahora.toISOString(),
     fechaLimite: fechaLimite.toISOString(),
     estadoTransaccion: "disponible",
   };
 
   excedentes.unshift(nuevo);
+  await guardarExcedente(nuevo);
   res.status(201).json(enriquecer(nuevo));
 });
