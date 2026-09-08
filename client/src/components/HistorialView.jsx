@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { api } from "../api.js";
+import { iconoAlimento } from "../utils/iconoAlimento.js";
 
 const formatoCOP = new Intl.NumberFormat("es-CO", {
   style: "currency",
@@ -54,7 +55,9 @@ export default function HistorialView() {
               {transacciones.map((t) => (
                 <tr key={t.id}>
                   <td>{formatoFecha.format(new Date(t.fecha))}</td>
-                  <td>{t.tipoAlimento}</td>
+                  <td>
+                    <span aria-hidden="true">{iconoAlimento(t.tipoAlimento)}</span> {t.tipoAlimento}
+                  </td>
                   <td>{t.comerciante}</td>
                   <td>
                     <span className={`etiqueta-tipo etiqueta-tipo--${t.tipoOperacion}`}>

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { iconoAlimento } from "../utils/iconoAlimento.js";
 
 const formatoCOP = new Intl.NumberFormat("es-CO", {
   style: "currency",
@@ -56,7 +57,10 @@ export default function ExcedenteCard({ excedente, modoMarketplace, onAccion }) 
         </span>
       </header>
 
-      <h3 className="card__titulo">{excedente.tipoAlimento}</h3>
+      <h3 className="card__titulo">
+        <span aria-hidden="true">{iconoAlimento(excedente.tipoAlimento)}</span>{" "}
+        {excedente.tipoAlimento}
+      </h3>
       <p className="card__meta">
         {excedente.comerciante} · {excedente.ubicacion}
       </p>

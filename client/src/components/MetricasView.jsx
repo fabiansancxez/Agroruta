@@ -42,7 +42,7 @@ export default function MetricasView() {
   return (
     <div className="vista">
       <section className="panel panel--north-star">
-        <p className="north-star__etiqueta">North Star Metric</p>
+        <p className="north-star__etiqueta">🌟 North Star Metric</p>
         <p className="north-star__valor">
           {northStarMetric.valor} <span>{northStarMetric.unidad}</span>
         </p>
@@ -53,18 +53,22 @@ export default function MetricasView() {
         <h2>Impacto y aprovechamiento</h2>
         <div className="tarjetas-stat">
           <div className="stat">
+            <p className="stat__icono" aria-hidden="true">📦</p>
             <p className="stat__valor">{kg.publicados} kg</p>
             <p className="stat__etiqueta">Publicados en total</p>
           </div>
           <div className="stat">
+            <p className="stat__icono" aria-hidden="true">♻️</p>
             <p className="stat__valor">{kg.rescatados} kg</p>
             <p className="stat__etiqueta">Rescatados (vendidos o donados)</p>
           </div>
           <div className="stat">
+            <p className="stat__icono" aria-hidden="true">🕒</p>
             <p className="stat__valor">{kg.disponibles} kg</p>
             <p className="stat__etiqueta">Disponibles ahora mismo</p>
           </div>
           <div className="stat">
+            <p className="stat__icono" aria-hidden="true">⚠️</p>
             <p className="stat__valor">{kg.vencidos} kg</p>
             <p className="stat__etiqueta">Perdidos por vencimiento</p>
           </div>
@@ -102,14 +106,17 @@ export default function MetricasView() {
         <h2>Actividad comercial</h2>
         <div className="tarjetas-stat">
           <div className="stat">
+            <p className="stat__icono" aria-hidden="true">🛒</p>
             <p className="stat__valor">{transacciones.compras}</p>
             <p className="stat__etiqueta">Compras registradas</p>
           </div>
           <div className="stat">
+            <p className="stat__icono" aria-hidden="true">🤲</p>
             <p className="stat__valor">{transacciones.donaciones}</p>
             <p className="stat__etiqueta">Donaciones reclamadas</p>
           </div>
           <div className="stat">
+            <p className="stat__icono" aria-hidden="true">💰</p>
             <p className="stat__valor">{formatoCOP.format(ingresosComision)}</p>
             <p className="stat__etiqueta">Ingresos por comisión (8%)</p>
           </div>
