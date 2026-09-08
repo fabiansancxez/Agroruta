@@ -9,11 +9,10 @@ export default function Header({ vistaActiva, onCambiarVista }) {
   return (
     <header className="app-header">
       <div className="app-header__marca">
-        <span className="app-header__logo">🌱</span>
-        <div>
-          <h1>AgroRuta</h1>
-          <p>Cada alimento tiene una ruta.</p>
-        </div>
+        {/* El logo ya incluye el nombre "AgroRuta" y el eslogan, por eso el
+            h1 queda solo para lectores de pantalla (no se ve duplicado). */}
+        <h1 className="sr-solo">AgroRuta</h1>
+        <img src="/logo-agroruta.jpg" alt="AgroRuta - Cada alimento tiene una ruta" className="app-header__logo-img" />
       </div>
 
       <nav className="app-header__nav">
